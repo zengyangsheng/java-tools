@@ -5,8 +5,11 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author yangsheng.zeng
@@ -48,5 +51,28 @@ public class ListUtils extends CollectionUtils {
             }
         }
         return returnList;
+    }
+
+    /**
+     * @Description: 将list根据指定属性返回对应map集合
+     * @param [list, methodName, c]
+     * @return java.util.Map<K,V>
+    */
+    public static <K,V> Map<K,V> list2Map(List<V> list,String methodName,Class<V> c){
+        Map<K, V> map = new HashMap<>();
+        if (list != null) {
+            try {
+                Method methodGetKey = c.getMethod(methodName);
+                for (int i = 0; i < list.size(); i++) {
+                    V value = list.get(i);
+                    @SuppressWarnings("unchecked")
+                    K key = (K) methodGetKey.invoke(list.get(i));
+                    map.put(key, value);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("转换异常");
+            }
+        }
+        return map;
     }
 }
